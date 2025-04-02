@@ -64,16 +64,23 @@ export default function GamePage({ params }: GamePageProps) {
       const data = await res.json()
 
       if (!data.joinedRoles.includes(role)) {
+        if (data.joinedRoles.includes(role)) {
+          alert(`Role ${role} is already taken. Please return to lobby and select the other.`)
+          return
+        }
+      
         const updated = {
           ...data,
           joinedRoles: [...data.joinedRoles, role],
         }
+      
         await fetch(`/api/games/${gameId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updated),
         })
       }
+      
     }
 
     register()

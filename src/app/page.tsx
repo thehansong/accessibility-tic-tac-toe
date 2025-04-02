@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,19 @@ import { Input } from "@/components/ui/input"
 export default function Home() {
   const [joinGameId, setJoinGameId] = useState("")
   const [selectedRole, setSelectedRole] = useState<"X" | "O" | null>(null)
+  const [joinedRoles, setJoinedRoles] = useState<("X" | "O")[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    if (!joinGameId) return
+    const fetchRoles = async () => {
+      const res = await fetch(`/api/games/${joinGameId}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setJoinedRoles(data.joinedRoles || [])
+    }
+    fetchRoles()
+  }, [joinGameId])
 
   const handleCreateGame = () => {
     if (!selectedRole) return alert("Please select a role first.")
@@ -21,6 +33,9 @@ export default function Home() {
   const handleJoinGame = () => {
     if (!selectedRole || !joinGameId.trim()) {
       return alert("Please enter a Game ID and select a role.")
+    }
+    if (joinedRoles.includes(selectedRole)) {
+      return alert(`Role ${selectedRole} is already taken in this game.`)
     }
     localStorage.setItem(`tic-role-${joinGameId}`, selectedRole)
     router.push(`/game/${joinGameId.trim()}`)
@@ -43,16 +58,18 @@ export default function Home() {
               onClick={() => setSelectedRole("X")}
               aria-pressed={selectedRole === "X"}
               aria-label="Select to play as X"
+              disabled={joinedRoles.includes("X")}
             >
-              🧍 Player X
+              🧍 Player X {joinedRoles.includes("X") && "(Taken)"}
             </Button>
             <Button
               variant={selectedRole === "O" ? "default" : "outline"}
               onClick={() => setSelectedRole("O")}
               aria-pressed={selectedRole === "O"}
               aria-label="Select to play as O"
+              disabled={joinedRoles.includes("O")}
             >
-              🧍 Player O
+              🧍 Player O {joinedRoles.includes("O") && "(Taken)"}
             </Button>
           </div>
 
