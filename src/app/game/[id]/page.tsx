@@ -1,16 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 
 interface GamePageProps {
-  params: {
-    id: string
-  }
+  params: { id: string }
 }
 
 type Player = "X" | "O"
 type Cell = Player | null
+type GameState = {
+  board: Cell[]
+  currentPlayer: Player
+  winner: Player | "Draw" | null
+}
 
 const winningCombos = [
   [0, 1, 2],
@@ -27,33 +30,76 @@ export default function GamePage({ params }: GamePageProps) {
   const gameId = params.id
   if (!gameId) notFound()
 
-  const [board, setBoard] = useState<Cell[]>(Array(9).fill(null))
-  const [currentPlayer, setCurrentPlayer] = useState<Player>("X")
-  const [winner, setWinner] = useState<Player | "Draw" | null>(null)
+  const [game, setGame] = useState<GameState>({
+    board: Array(9).fill(null),
+    currentPlayer: "X",
+    winner: null,
+  })
 
-  const checkWinner = (newBoard: Cell[]) => {
+  // Poll every 2 seconds to fetch latest game state
+  useEffect(() => {
+    const fetchGame = async () => {
+      const res = await fetch(`/api/games/${gameId}`)
+      const data = await res.json()
+      setGame(data)
+    }
+
+    fetchGame()
+    const interval = setInterval(fetchGame, 2000)
+    return () => clearInterval(interval)
+  }, [gameId])
+
+  const checkWinner = (board: Cell[]): Player | "Draw" | null => {
     for (const [a, b, c] of winningCombos) {
-      if (newBoard[a] && newBoard[a] === newBoard[b] && newBoard[b] === newBoard[c]) {
-        return newBoard[a]
+      if (board[a] && board[a] === board[b] && board[b] === board[c]) {
+        return board[a]
       }
     }
-    return newBoard.every((cell) => cell !== null) ? "Draw" : null
+    return board.every((cell) => cell !== null) ? "Draw" : null
   }
 
-  const handleMove = (index: number) => {
-    if (board[index] || winner) return
+  const handleMove = async (index: number) => {
+    if (game.board[index] || game.winner) return
 
-    const newBoard = [...board]
-    newBoard[index] = currentPlayer
-    setBoard(newBoard)
+    const newBoard = [...game.board]
+    newBoard[index] = game.currentPlayer
+    const winner = checkWinner(newBoard)
+    const nextPlayer = game.currentPlayer === "X" ? "O" : "X"
 
-    const result = checkWinner(newBoard)
-    if (result) {
-      setWinner(result)
-    } else {
-      setCurrentPlayer(currentPlayer === "X" ? "O" : "X")
+    const updatedGame: GameState = {
+      board: newBoard,
+      currentPlayer: winner ? game.currentPlayer : nextPlayer,
+      winner,
     }
+
+    setGame(updatedGame)
+
+    await fetch(`/api/games/${gameId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedGame),
+    })
   }
+
+  const handleRestart = async () => {
+    const newGame: GameState = {
+      board: Array(9).fill(null),
+      currentPlayer: "X",
+      winner: null,
+    }
+  
+    await fetch(`/api/games/${gameId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newGame),
+    })
+  
+    // fetch updated game state after reset
+    const res = await fetch(`/api/games/${gameId}`)
+    const data = await res.json()
+    setGame(data)
+  }
+  
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4 bg-gray-100">
@@ -62,37 +108,25 @@ export default function GamePage({ params }: GamePageProps) {
           Game ID: {gameId}
         </h1>
 
-        {winner ? (
+        {game.winner ? (
           <>
-            <p
-              className="text-xl font-semibold text-green-600"
-              role="status"
-              aria-live="assertive"
-            >
-              {winner === "Draw" ? "It’s a draw!" : `🎉 Player ${winner} wins!`}
+            <p className="text-xl font-semibold text-green-600" role="status" aria-live="assertive">
+              {game.winner === "Draw" ? "It’s a draw!" : `🎉 Player ${game.winner} wins!`}
             </p>
             <button
-              onClick={() => {
-                setBoard(Array(9).fill(null))
-                setCurrentPlayer("X")
-                setWinner(null)
-              }}
+              onClick={handleRestart}
               className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
               aria-label="Restart game"
             >
-              Restart Game
+              🔄 Restart Game
             </button>
           </>
         ) : (
-          <p className="text-muted-foreground">Current Turn: {currentPlayer}</p>
+          <p className="text-muted-foreground">Current Turn: {game.currentPlayer}</p>
         )}
 
-        <div
-          className="grid grid-cols-3 gap-2"
-          role="grid"
-          aria-label="Tic Tac Toe board"
-        >
-          {board.map((value, i) => (
+        <div className="grid grid-cols-3 gap-2" role="grid" aria-label="Tic Tac Toe board">
+          {game.board.map((value, i) => (
             <button
               key={i}
               role="gridcell"
@@ -106,7 +140,7 @@ export default function GamePage({ params }: GamePageProps) {
                   handleMove(i)
                 }
               }}
-              disabled={!!value || !!winner}
+              disabled={!!value || !!game.winner}
             >
               {value}
             </button>
