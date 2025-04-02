@@ -7,6 +7,8 @@ type GameState = {
   board: Cell[]
   currentPlayer: Player
   winner: Player | "Draw" | null
+  joinedRoles: Player[]
+  timeLeft: number
 }
 
 // In-memory game store only resets when server restarts
@@ -24,7 +26,10 @@ export async function GET(
       board: Array(9).fill(null),
       currentPlayer: "X",
       winner: null,
+      joinedRoles: [],
+      timeLeft: 15,
     }
+    
     gameStore.set(id, newGame)
     return NextResponse.json(newGame)
   }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { notFound } from "next/navigation"
 
 interface GamePageProps {
@@ -9,10 +9,13 @@ interface GamePageProps {
 
 type Player = "X" | "O"
 type Cell = Player | null
+
 type GameState = {
   board: Cell[]
   currentPlayer: Player
   winner: Player | "Draw" | null
+  joinedRoles: Player[]
+  timeLeft: number
 }
 
 const winningCombos = [
@@ -34,9 +37,42 @@ export default function GamePage({ params }: GamePageProps) {
     board: Array(9).fill(null),
     currentPlayer: "X",
     winner: null,
+    joinedRoles: [],
+    timeLeft: 15,
   })
 
-  // Poll every 2 seconds to fetch latest game state
+  const [playerRole, setPlayerRole] = useState<Player | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    const role = localStorage.getItem(`tic-role-${gameId}`) as Player | null
+    if (!role) {
+      alert("No player role found. Please rejoin from the lobby.")
+      return
+    }
+    setPlayerRole(role)
+
+    const register = async () => {
+      const res = await fetch(`/api/games/${gameId}`)
+      const data = await res.json()
+
+      if (!data.joinedRoles.includes(role)) {
+        const updated = {
+          ...data,
+          joinedRoles: [...data.joinedRoles, role],
+        }
+        await fetch(`/api/games/${gameId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updated),
+        })
+      }
+    }
+
+    register()
+  }, [gameId])
+
+  // Poll game state every 1s
   useEffect(() => {
     const fetchGame = async () => {
       const res = await fetch(`/api/games/${gameId}`)
@@ -45,9 +81,60 @@ export default function GamePage({ params }: GamePageProps) {
     }
 
     fetchGame()
-    const interval = setInterval(fetchGame, 2000)
+    const interval = setInterval(fetchGame, 1000)     // 1000 ms
     return () => clearInterval(interval)
   }, [gameId])
+
+  // Timer countdown synced to 1s
+  useEffect(() => {
+    if (
+      game.winner ||
+      playerRole !== game.currentPlayer ||
+      game.joinedRoles.length < 2
+    )
+      return
+
+    intervalRef.current = setInterval(async () => {
+      const newTime = Math.max(0, game.timeLeft - 1)
+
+      const updatedGame: GameState = {
+        ...game,
+        timeLeft: newTime,
+      }
+
+      setGame(updatedGame)
+
+      if (newTime <= 0) {
+        clearInterval(intervalRef.current!)
+        skipTurn()
+        return
+      }
+
+      await fetch(`/api/games/${gameId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedGame),
+      })
+    }, 1000)
+
+    return () => clearInterval(intervalRef.current!)
+  }, [game.currentPlayer, playerRole, game.winner, game.joinedRoles, game.timeLeft])
+
+  const skipTurn = async () => {
+    const nextPlayer: Player = game.currentPlayer === "X" ? "O" : "X"
+    const updatedGame: GameState = {
+      ...game,
+      currentPlayer: nextPlayer,
+      timeLeft: 15,
+    }
+
+    setGame(updatedGame)
+    await fetch(`/api/games/${gameId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedGame),
+    })
+  }
 
   const checkWinner = (board: Cell[]): Player | "Draw" | null => {
     for (const [a, b, c] of winningCombos) {
@@ -59,7 +146,13 @@ export default function GamePage({ params }: GamePageProps) {
   }
 
   const handleMove = async (index: number) => {
-    if (game.board[index] || game.winner) return
+    if (
+      game.board[index] ||
+      game.winner ||
+      playerRole !== game.currentPlayer ||
+      game.joinedRoles.length < 2
+    )
+      return
 
     const newBoard = [...game.board]
     newBoard[index] = game.currentPlayer
@@ -67,9 +160,11 @@ export default function GamePage({ params }: GamePageProps) {
     const nextPlayer = game.currentPlayer === "X" ? "O" : "X"
 
     const updatedGame: GameState = {
+      ...game,
       board: newBoard,
       currentPlayer: winner ? game.currentPlayer : nextPlayer,
       winner,
+      timeLeft: 15,
     }
 
     setGame(updatedGame)
@@ -86,46 +181,75 @@ export default function GamePage({ params }: GamePageProps) {
       board: Array(9).fill(null),
       currentPlayer: "X",
       winner: null,
+      joinedRoles: game.joinedRoles,
+      timeLeft: 15,
     }
-  
+
     await fetch(`/api/games/${gameId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newGame),
     })
-  
-    // fetch updated game state after reset
+
     const res = await fetch(`/api/games/${gameId}`)
     const data = await res.json()
     setGame(data)
   }
-  
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4 bg-gray-100">
       <div className="w-full max-w-md text-center space-y-4">
-        <h1 className="text-2xl font-bold" role="heading" aria-level={1}>
-          Game ID: {gameId}
-        </h1>
+        <h1 className="text-2xl font-bold">Game ID: {gameId}</h1>
+
+        <p className="text-muted-foreground">
+          You are playing as <strong>{playerRole}</strong>
+        </p>
+
+        {game.joinedRoles.length < 2 && (
+          <p className="text-yellow-600 font-medium">
+            Waiting for second player to join...
+          </p>
+        )}
 
         {game.winner ? (
           <>
-            <p className="text-xl font-semibold text-green-600" role="status" aria-live="assertive">
-              {game.winner === "Draw" ? "It’s a draw!" : `🎉 Player ${game.winner} wins!`}
+            <p
+              className="text-xl font-semibold text-green-600"
+              role="status"
+              aria-live="assertive"
+            >
+              {game.winner === "Draw"
+                ? "It’s a draw!"
+                : `🎉 Player ${game.winner} wins!`}
             </p>
             <button
               onClick={handleRestart}
               className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
               aria-label="Restart game"
             >
-              🔄 Restart Game
+              Restart Game
             </button>
           </>
         ) : (
-          <p className="text-muted-foreground">Current Turn: {game.currentPlayer}</p>
+          <>
+            <p>
+              Current Turn: <strong>{game.currentPlayer}</strong>
+            </p>
+            {game.joinedRoles.length >= 2 && (
+              <p className="font-semibold text-sm">
+                ⏳ {playerRole === game.currentPlayer
+                  ? `Your turn – ${Math.floor(game.timeLeft)}s remaining`
+                  : `Waiting for opponent – ${Math.floor(game.timeLeft)}s left`}
+              </p>
+            )}
+          </>
         )}
 
-        <div className="grid grid-cols-3 gap-2" role="grid" aria-label="Tic Tac Toe board">
+        <div
+          className="grid grid-cols-3 gap-2"
+          role="grid"
+          aria-label="Tic Tac Toe board"
+        >
           {game.board.map((value, i) => (
             <button
               key={i}
@@ -140,7 +264,12 @@ export default function GamePage({ params }: GamePageProps) {
                   handleMove(i)
                 }
               }}
-              disabled={!!value || !!game.winner}
+              disabled={
+                !!value ||
+                !!game.winner ||
+                playerRole !== game.currentPlayer ||
+                game.joinedRoles.length < 2
+              }
             >
               {value}
             </button>
