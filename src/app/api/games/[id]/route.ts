@@ -9,6 +9,7 @@ type GameState = {
   winner: Player | "Draw" | null
   joinedRoles: Player[]
   timeLeft: number
+  lastUpdated: number
 }
 
 // In-memory game store only resets when server restarts
@@ -28,6 +29,7 @@ export async function GET(
       winner: null,
       joinedRoles: [],
       timeLeft: 15,
+      lastUpdated: Date.now(),      
     }
     
     gameStore.set(id, newGame)
@@ -52,6 +54,11 @@ export async function POST(
     )
   }
 
-  gameStore.set(id, body)
+  const updatedGame: GameState = {
+    ...body,
+    lastUpdated: Date.now(),
+  }
+
+  gameStore.set(id, updatedGame)
   return NextResponse.json({ success: true })
 }

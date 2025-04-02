@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 
 interface GamePageProps {
@@ -16,6 +16,7 @@ type GameState = {
   winner: Player | "Draw" | null
   joinedRoles: Player[]
   timeLeft: number
+  lastUpdated: number
 }
 
 const winningCombos = [
@@ -39,10 +40,16 @@ export default function GamePage({ params }: GamePageProps) {
     winner: null,
     joinedRoles: [],
     timeLeft: 15,
+    lastUpdated: Date.now(),
   })
 
   const [playerRole, setPlayerRole] = useState<Player | null>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const getDisplayedTime = () => {
+    const now = Date.now()
+    const elapsed = (now - game.lastUpdated) / 1000
+    return Math.max(0, Math.floor(game.timeLeft - elapsed))
+  }
 
   useEffect(() => {
     const role = localStorage.getItem(`tic-role-${gameId}`) as Player | null
@@ -72,7 +79,6 @@ export default function GamePage({ params }: GamePageProps) {
     register()
   }, [gameId])
 
-  // Poll game state every 1s
   useEffect(() => {
     const fetchGame = async () => {
       const res = await fetch(`/api/games/${gameId}`)
@@ -84,57 +90,6 @@ export default function GamePage({ params }: GamePageProps) {
     const interval = setInterval(fetchGame, 1000)     // 1000 ms
     return () => clearInterval(interval)
   }, [gameId])
-
-  // Timer countdown synced to 1s
-  useEffect(() => {
-    if (
-      game.winner ||
-      playerRole !== game.currentPlayer ||
-      game.joinedRoles.length < 2
-    )
-      return
-
-    intervalRef.current = setInterval(async () => {
-      const newTime = Math.max(0, game.timeLeft - 1)
-
-      const updatedGame: GameState = {
-        ...game,
-        timeLeft: newTime,
-      }
-
-      setGame(updatedGame)
-
-      if (newTime <= 0) {
-        clearInterval(intervalRef.current!)
-        skipTurn()
-        return
-      }
-
-      await fetch(`/api/games/${gameId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedGame),
-      })
-    }, 1000)
-
-    return () => clearInterval(intervalRef.current!)
-  }, [game.currentPlayer, playerRole, game.winner, game.joinedRoles, game.timeLeft])
-
-  const skipTurn = async () => {
-    const nextPlayer: Player = game.currentPlayer === "X" ? "O" : "X"
-    const updatedGame: GameState = {
-      ...game,
-      currentPlayer: nextPlayer,
-      timeLeft: 15,
-    }
-
-    setGame(updatedGame)
-    await fetch(`/api/games/${gameId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedGame),
-    })
-  }
 
   const checkWinner = (board: Cell[]): Player | "Draw" | null => {
     for (const [a, b, c] of winningCombos) {
@@ -165,6 +120,7 @@ export default function GamePage({ params }: GamePageProps) {
       currentPlayer: winner ? game.currentPlayer : nextPlayer,
       winner,
       timeLeft: 15,
+      lastUpdated: Date.now(),
     }
 
     setGame(updatedGame)
@@ -183,6 +139,7 @@ export default function GamePage({ params }: GamePageProps) {
       winner: null,
       joinedRoles: game.joinedRoles,
       timeLeft: 15,
+      lastUpdated: Date.now(),
     }
 
     await fetch(`/api/games/${gameId}`, {
@@ -238,8 +195,8 @@ export default function GamePage({ params }: GamePageProps) {
             {game.joinedRoles.length >= 2 && (
               <p className="font-semibold text-sm">
                 ⏳ {playerRole === game.currentPlayer
-                  ? `Your turn – ${Math.floor(game.timeLeft)}s remaining`
-                  : `Waiting for opponent – ${Math.floor(game.timeLeft)}s left`}
+                  ? `Your turn – ${getDisplayedTime()}s remaining`
+                  : `Waiting for opponent – ${getDisplayedTime()}s left`}
               </p>
             )}
           </>
