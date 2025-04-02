@@ -61,10 +61,28 @@ export default function GamePage({ params }: GamePageProps) {
         <h1 className="text-2xl font-bold" role="heading" aria-level={1}>
           Game ID: {gameId}
         </h1>
+
         {winner ? (
-          <p className="text-xl font-semibold text-green-600" role="status" aria-live="assertive">
-            {winner === "Draw" ? "It’s a draw!" : `🎉 Player ${winner} wins!`}
-          </p>
+          <>
+            <p
+              className="text-xl font-semibold text-green-600"
+              role="status"
+              aria-live="assertive"
+            >
+              {winner === "Draw" ? "It’s a draw!" : `🎉 Player ${winner} wins!`}
+            </p>
+            <button
+              onClick={() => {
+                setBoard(Array(9).fill(null))
+                setCurrentPlayer("X")
+                setWinner(null)
+              }}
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              aria-label="Restart game"
+            >
+              Restart Game
+            </button>
+          </>
         ) : (
           <p className="text-muted-foreground">Current Turn: {currentPlayer}</p>
         )}
