@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 export default function Home() {
   const [joinGameId, setJoinGameId] = useState("")
@@ -63,7 +64,7 @@ export default function Home() {
               aria-label="Select to play as X"
               disabled={joinedRoles.includes("X")}
             >
-              🧍 Player X {joinedRoles.includes("X") && "(Taken)"}
+              Player X {joinedRoles.includes("X") && "(Taken)"}
             </Button>
             <Button
               variant={selectedRole === "O" ? "default" : "outline"}
@@ -72,7 +73,7 @@ export default function Home() {
               aria-label="Select to play as O"
               disabled={joinedRoles.includes("O")}
             >
-              🧍 Player O {joinedRoles.includes("O") && "(Taken)"}
+              Player O {joinedRoles.includes("O") && "(Taken)"}
             </Button>
           </div>
 
@@ -93,6 +94,14 @@ export default function Home() {
                 🔗 Join Game
               </Button>
             </div>
+          </div>
+          
+          <div className="pt-4 border-t w-full mt-2">
+            <Link href="/history">
+              <Button variant="link" className="w-full" aria-label="View game history">
+                View Game History
+              </Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

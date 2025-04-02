@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
 import { CopyButton } from "@/components/ui/copy-button"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 interface GamePageProps {
   params: { id: string }
@@ -163,10 +165,24 @@ export default function GamePage({ params }: GamePageProps) {
   return (
     <main className="flex min-h-screen items-center justify-center p-4 bg-gray-100">
       <div className="w-full max-w-md text-center space-y-4">
-        <h1 className="text-2xl font-bold flex items-center justify-center space-x-2">
-          Game ID: {gameId}
-          <CopyButton value={gameId} className="ml-2" label="Copy Game ID" />
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold flex items-center space-x-2">
+            Game ID: {gameId}
+            <CopyButton value={gameId} className="ml-2" label="Copy Game ID" />
+          </h1>
+          <div className="flex gap-2">
+            <Link href="/history">
+              <Button variant="outline" size="sm" aria-label="View game history">
+                Game History
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" size="sm" aria-label="Return to home">
+                Back to Main Menu
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         <p className="text-muted-foreground">
           You are playing as <strong>{playerRole}</strong>
@@ -186,7 +202,7 @@ export default function GamePage({ params }: GamePageProps) {
               aria-live="assertive"
             >
               {game.winner === "Draw"
-                ? "It’s a draw!"
+                ? "It's a draw!"
                 : `🎉 Player ${game.winner} wins!`}
             </p>
             <button

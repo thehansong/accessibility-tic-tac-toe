@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { recordMove } from "../../history/route"
 
 type Player = "X" | "O"
 type Cell = Player | null
@@ -45,6 +46,7 @@ export async function POST(
 ) {
   const { id } = await context.params
   const body = await req.json()
+  const currentGame = gameStore.get(id)
 
   // only check if the game exists
   if (!gameStore.has(id)) {
@@ -52,6 +54,17 @@ export async function POST(
       { error: "Game not found." },
       { status: 404 }
     )
+  }
+
+  // if there's a previous state, compare boards to detect moves
+  if (currentGame && body.board) {
+    // find which cell changed to record the move
+    for (let i = 0; i < 9; i++) {
+      if (currentGame.board[i] === null && body.board[i] !== null) {
+        recordMove(id, body.board[i], i, body)
+        break
+      }
+    }
   }
 
   const updatedGame: GameState = {
