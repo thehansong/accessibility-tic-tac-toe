@@ -19,7 +19,7 @@ export async function GET(
   req: NextRequest,
   context: { params: { id: string } }
 ) {
-  const { id } = context.params
+  const { id } = await context.params
   const game = gameStore.get(id)
 
   if (!game) {
@@ -43,7 +43,7 @@ export async function POST(
   req: NextRequest,
   context: { params: { id: string } }
 ) {
-  const { id } = context.params
+  const { id } = await context.params
   const body = await req.json()
 
   // only check if the game exists
