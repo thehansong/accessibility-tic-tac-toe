@@ -25,11 +25,14 @@ export default function Home() {
 
   const handleCreateGame = () => {
     if (!selectedRole) return alert("Please select a role first.")
-    const gameId = Math.random().toString(36).substring(2, 8)
+  
+    // Check for if user-entered Game ID if provided, else auto-generate new Game ID
+    const gameId = joinGameId.trim() || Math.random().toString(36).substring(2, 8)
+  
     localStorage.setItem(`tic-role-${gameId}`, selectedRole)
     router.push(`/game/${gameId}`)
   }
-
+  
   const handleJoinGame = () => {
     if (!selectedRole || !joinGameId.trim()) {
       return alert("Please enter a Game ID and select a role.")
