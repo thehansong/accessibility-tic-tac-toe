@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
+import { CopyButton } from "@/components/ui/copy-button"
 
 interface GamePageProps {
   params: { id: string }
@@ -80,7 +81,6 @@ export default function GamePage({ params }: GamePageProps) {
           body: JSON.stringify(updated),
         })
       }
-      
     }
 
     register()
@@ -163,7 +163,10 @@ export default function GamePage({ params }: GamePageProps) {
   return (
     <main className="flex min-h-screen items-center justify-center p-4 bg-gray-100">
       <div className="w-full max-w-md text-center space-y-4">
-        <h1 className="text-2xl font-bold">Game ID: {gameId}</h1>
+        <h1 className="text-2xl font-bold flex items-center justify-center space-x-2">
+          Game ID: {gameId}
+          <CopyButton value={gameId} className="ml-2" label="Copy Game ID" />
+        </h1>
 
         <p className="text-muted-foreground">
           You are playing as <strong>{playerRole}</strong>
