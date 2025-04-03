@@ -51,7 +51,6 @@ export async function POST(
       return NextResponse.json({ error: "Game not found" }, { status: 404 })
     }
 
-    // Detect move to record
     const prevBoard = existingGame.board
     const newBoard = body.board
     for (let i = 0; i < 9; i++) {
@@ -66,7 +65,6 @@ export async function POST(
       }
     }
 
-    // Update fields
     existingGame.board = newBoard
     existingGame.currentPlayer = body.currentPlayer
     existingGame.winner = body.winner
