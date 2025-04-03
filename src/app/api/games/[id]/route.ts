@@ -5,14 +5,13 @@ import { recordMove } from "../../history/route"
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectToDatabase()
-    
-    // Access id as a property of an awaited Promise to satisfy Next.js
-    const { id } = await Promise.resolve(params)
-    
+
+    const { id } = context.params
+
     let game = await Game.findOne({ gameId: id })
 
     if (!game) {
@@ -39,11 +38,11 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectToDatabase()
-    const { id } = await Promise.resolve(params)
+    const { id } = context.params
     const body = await req.json()
 
     const existingGame = await Game.findOne({ gameId: id })
@@ -75,7 +74,6 @@ export async function POST(
     existingGame.timeLeft = body.timeLeft
     existingGame.lastUpdated = Date.now()
 
-    // Set endTime if game ended
     if (body.winner && !existingGame.endTime) {
       existingGame.endTime = Date.now()
     }
