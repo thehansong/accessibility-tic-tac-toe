@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { notFound } from "next/navigation"
+import { notFound, useParams, useSearchParams } from "next/navigation"
 import { CopyButton } from "@/components/ui/copy-button"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useParams } from "next/navigation"
 
 type Player = "X" | "O"
 type Cell = Player | null
@@ -32,8 +31,9 @@ const winningCombos = [
 
 export default function GamePage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const gameId = params.id as string
-  
+
   if (!gameId) notFound()
 
   const [game, setGame] = useState<GameState>({
@@ -54,48 +54,50 @@ export default function GamePage() {
   }
 
   useEffect(() => {
-    const role = localStorage.getItem(`tic-role-${gameId}`) as Player | null
-    if (!role) {
-      alert("No player role found. Please rejoin from the lobby.")
+    const queryRole = searchParams.get("role") as Player | null
+    const savedRole = localStorage.getItem(`tic-role-${gameId}`) as Player | null
+    const role = savedRole || queryRole
+
+    if (!role || (role !== "X" && role !== "O")) {
+      alert("No valid player role found. Please rejoin from the main menu or use ?role=X/O in the URL.")
       return
     }
+
+    localStorage.setItem(`tic-role-${gameId}`, role)
     setPlayerRole(role)
 
     const register = async () => {
       const res = await fetch(`/api/games/${gameId}`)
       const data = await res.json()
-    
-      // If role is already taken, don't register
+
       if (data.joinedRoles.includes(role)) {
         console.log(`[register] Role ${role} already in use`)
         return
       }
-    
+
       const updated = {
         ...data,
         joinedRoles: [...new Set([...data.joinedRoles, role])],
       }
-    
+
       const updateRes = await fetch(`/api/games/${gameId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
       })
-    
+
       if (!updateRes.ok) {
         console.error("Failed to register player role")
         return
       }
-    
-      // Fetch the latest state after updating
+
       const refreshed = await fetch(`/api/games/${gameId}`)
       const refreshedData = await refreshed.json()
       setGame(refreshedData)
     }
-    
 
     register()
-  }, [gameId])
+  }, [gameId, searchParams])
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -105,7 +107,7 @@ export default function GamePage() {
     }
 
     fetchGame()
-    const interval = setInterval(fetchGame, 1000)     // 1000 ms
+    const interval = setInterval(fetchGame, 1000)
     return () => clearInterval(interval)
   }, [gameId])
 
