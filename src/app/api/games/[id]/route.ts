@@ -1,15 +1,14 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import Game from "@/models/Game"
 import { recordMove } from "../../history/route"
 
 export async function GET(
-  req: NextRequest,
+  request: Request,
   context: { params: { id: string } }
-) {
+): Promise<Response> {
   try {
     await connectToDatabase()
-
     const { id } = context.params
 
     let game = await Game.findOne({ gameId: id })
@@ -37,13 +36,13 @@ export async function GET(
 }
 
 export async function POST(
-  req: NextRequest,
+  request: Request,
   context: { params: { id: string } }
-) {
+): Promise<Response> {
   try {
     await connectToDatabase()
     const { id } = context.params
-    const body = await req.json()
+    const body = await request.json()
 
     const existingGame = await Game.findOne({ gameId: id })
 
