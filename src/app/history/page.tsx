@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+// import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -25,7 +25,7 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<GameHistory[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedGame, setSelectedGame] = useState<GameHistory | null>(null)
-  const router = useRouter()
+  // const router = useRouter()
 
   useEffect(() => {
     const fetchHistory = async () => {
