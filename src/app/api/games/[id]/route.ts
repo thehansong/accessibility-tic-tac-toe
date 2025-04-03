@@ -3,15 +3,13 @@ import { connectToDatabase } from "@/lib/mongodb"
 import Game from "@/models/Game"
 import { recordMove } from "../../history/route"
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest) {
   try {
     await connectToDatabase()
-    
-    const { id } = await Promise.resolve(params)
-    
+
+    const url = new URL(req.url)
+    const id = url.pathname.split("/").pop() as string
+
     const game = await Game.findOne({ gameId: id })
 
     if (!game) {
@@ -36,13 +34,12 @@ export async function GET(
   }
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest) {
   try {
     await connectToDatabase()
-    const { id } = await Promise.resolve(params)
+
+    const url = new URL(req.url)
+    const id = url.pathname.split("/").pop() as string
     const body = await req.json()
 
     const existingGame = await Game.findOne({ gameId: id })
@@ -74,7 +71,6 @@ export async function POST(
     existingGame.timeLeft = body.timeLeft
     existingGame.lastUpdated = Date.now()
 
-    // Set endTime if game ended
     if (body.winner && !existingGame.endTime) {
       existingGame.endTime = Date.now()
     }
@@ -86,3 +82,4 @@ export async function POST(
     return NextResponse.json({ error: "Failed to update game" }, { status: 500 })
   }
 }
+
