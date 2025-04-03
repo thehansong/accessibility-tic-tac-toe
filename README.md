@@ -2,15 +2,25 @@
 **Email**: [thehansong@gmail.com](mailto:thehansong@gmail.com)  
 **LinkedIn**: [thehansong](https://www.linkedin.com/in/thehansong/)
 
-
 A screen reader-friendly multiplayer Tic Tac Toe game designed for inclusive gaming.
 
 ---
 
-### Setup & Requirements
+### Hosting / Deployment Notes
 
-- Node.js 18 or above
-- MongoDB URI (MongoDB Atlas or local instance)
+This application is intended to be run **locally**, as per project scope. 
+
+---
+
+### Setup & Prerequisite
+- **[Node.js v18 or above](https://nodejs.org/en/download/)** – Required to run the project locally
+
+  You can check your version of Node.js with:
+    ```
+    node -v
+    ```
+- **MongoDB URI** – _No local installation needed_  
+  A shared MongoDB Atlas URI is provided in the `.env.local` setup step 3 below.
 
 ---
 
@@ -28,7 +38,7 @@ A screen reader-friendly multiplayer Tic Tac Toe game designed for inclusive gam
     npm install
     ```
 
-3. **Create a `.env.local` file**
+3. **Create a `.env.local` file in the root directory**
     <p align="center">
       <img src="https://github.com/user-attachments/assets/1d547449-5b0d-4adf-ac5b-e0eca2757e48" alt="Figure 1: .env.local location" width="500"/>
     </p>
