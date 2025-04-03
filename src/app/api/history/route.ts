@@ -2,49 +2,49 @@ import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import Game from "@/models/Game"
 
-type Player = "X" | "O"
-type Cell = Player | null
+// type Player = "X" | "O"
+// type Cell = Player | null
 
-type GameState = {
-  board: Cell[]
-  currentPlayer: Player
-  winner: Player | "Draw" | null
-  joinedRoles: Player[]
-  timeLeft: number
-  lastUpdated: number
-}
+// type GameState = {
+//   board: Cell[]
+//   currentPlayer: Player
+//   winner: Player | "Draw" | null
+//   joinedRoles: Player[]
+//   timeLeft: number
+//   lastUpdated: number
+// }
 
-// MongoDB persistence
-export async function recordMove(
-  gameId: string,
-  player: Player,
-  position: number,
-  gameState: GameState
-) {
-  await connectToDatabase()
-  const game = await Game.findOne({ gameId })
+// // MongoDB persistence
+// export async function recordMove(
+//   gameId: string,
+//   player: Player,
+//   position: number,
+//   gameState: GameState
+// ) {
+//   await connectToDatabase()
+//   const game = await Game.findOne({ gameId })
 
-  if (!game) return
+//   if (!game) return
 
-  game.moves.push({
-    player,
-    position,
-    timestamp: Date.now(),
-  })
+//   game.moves.push({
+//     player,
+//     position,
+//     timestamp: Date.now(),
+//   })
 
-  // Set metadata
-  if (!game.startTime) {
-    game.startTime = Date.now()
-    game.players = [...gameState.joinedRoles]
-  }
+//   // Set metadata
+//   if (!game.startTime) {
+//     game.startTime = Date.now()
+//     game.players = [...gameState.joinedRoles]
+//   }
 
-  if (gameState.winner && !game.endTime) {
-    game.winner = gameState.winner
-    game.endTime = Date.now()
-  }
+//   if (gameState.winner && !game.endTime) {
+//     game.winner = gameState.winner
+//     game.endTime = Date.now()
+//   }
 
-  await game.save()
-}
+//   await game.save()
+// }
 
 // GET: Fetch all game history
 export async function GET() {

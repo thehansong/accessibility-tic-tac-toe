@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import Game from "@/models/Game"
-import { recordMove } from "../../history/route"
+import { recordMove } from "@/lib/recordMove"
 
 export async function GET(req: NextRequest) {
   try {
