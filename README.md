@@ -1,5 +1,5 @@
 # Accessibility Tic Tac Toe – AET-swe_OngYouYang
-**Name**: Ong You Yang (Hans)
+**Name**: Ong You Yang (Hans)  
 **Email**: [thehansong@gmail.com](mailto:thehansong@gmail.com)  
 **LinkedIn**: [thehansong](https://www.linkedin.com/in/thehansong/)
 
