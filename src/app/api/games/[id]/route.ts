@@ -1,39 +1,29 @@
 import { NextRequest, NextResponse } from "next/server"
+import { connectToDatabase } from "@/lib/mongodb"
+import Game from "@/models/Game"
 import { recordMove } from "../../history/route"
-
-type Player = "X" | "O"
-type Cell = Player | null
-
-type GameState = {
-  board: Cell[]
-  currentPlayer: Player
-  winner: Player | "Draw" | null
-  joinedRoles: Player[]
-  timeLeft: number
-  lastUpdated: number
-}
-
-// In-memory game store only resets when server restarts
-const gameStore = new Map<string, GameState>()
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params
-  const game = gameStore.get(id)
+  const id = params.id
+  await connectToDatabase()
+
+  let game = await Game.findOne({ gameId: id })
 
   if (!game) {
-    const newGame: GameState = {
+    const newGame = await Game.create({
+      gameId: id,
       board: Array(9).fill(null),
       currentPlayer: "X",
       winner: null,
       joinedRoles: [],
       timeLeft: 15,
-      lastUpdated: Date.now(),      
-    }
-    
-    gameStore.set(id, newGame)
+      lastUpdated: Date.now(),
+      startTime: Date.now(),
+      moves: [],
+    })
     return NextResponse.json(newGame)
   }
 
@@ -42,36 +32,46 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await context.params
+  const id = params.id
   const body = await req.json()
-  const currentGame = gameStore.get(id)
 
-  // only check if the game exists
-  if (!gameStore.has(id)) {
-    return NextResponse.json(
-      { error: "Game not found." },
-      { status: 404 }
-    )
+  await connectToDatabase()
+  const existingGame = await Game.findOne({ gameId: id })
+
+  if (!existingGame) {
+    return NextResponse.json({ error: "Game not found" }, { status: 404 })
   }
 
-  // if there's a previous state, compare boards to detect moves
-  if (currentGame && body.board) {
-    // find which cell changed to record the move
-    for (let i = 0; i < 9; i++) {
-      if (currentGame.board[i] === null && body.board[i] !== null) {
-        recordMove(id, body.board[i], i, body)
-        break
-      }
+  // Detect move to record
+  const prevBoard = existingGame.board
+  const newBoard = body.board
+  for (let i = 0; i < 9; i++) {
+    if (prevBoard[i] === null && newBoard[i] !== null) {
+      recordMove(id, newBoard[i], i, body)
+      existingGame.moves.push({
+        player: newBoard[i],
+        position: i,
+        timestamp: Date.now(),
+      })
+      break
     }
   }
 
-  const updatedGame: GameState = {
-    ...body,
-    lastUpdated: Date.now(),
+  // Update fields
+  existingGame.board = newBoard
+  existingGame.currentPlayer = body.currentPlayer
+  existingGame.winner = body.winner
+  existingGame.joinedRoles = body.joinedRoles
+  existingGame.timeLeft = body.timeLeft
+  existingGame.lastUpdated = Date.now()
+
+  // Set endTime if game ended
+  if (body.winner && !existingGame.endTime) {
+    existingGame.endTime = Date.now()
   }
 
-  gameStore.set(id, updatedGame)
+  await existingGame.save()
   return NextResponse.json({ success: true })
 }

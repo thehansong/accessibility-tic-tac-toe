@@ -116,7 +116,7 @@ export default function HistoryPage() {
                       Started: {formatDate(game.startTime)}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Players: {game.players.join(", ")}
+                      Players: {game.players?.join(", ") ?? "Unknown"}
                     </p>
                     <p className="text-sm font-medium mt-1">
                       {game.winner ? (
