@@ -5,10 +5,7 @@ import { notFound } from "next/navigation"
 import { CopyButton } from "@/components/ui/copy-button"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
-interface GamePageProps {
-  params: { id: string }
-}
+import { useParams } from "next/navigation"
 
 type Player = "X" | "O"
 type Cell = Player | null
@@ -33,8 +30,10 @@ const winningCombos = [
   [2, 4, 6],
 ]
 
-export default function GamePage({ params }: GamePageProps) {
-  const gameId = params.id
+export default function GamePage() {
+  const params = useParams()
+  const gameId = params.id as string
+  
   if (!gameId) notFound()
 
   const [game, setGame] = useState<GameState>({
