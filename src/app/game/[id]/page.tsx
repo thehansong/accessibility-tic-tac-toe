@@ -64,25 +64,35 @@ export default function GamePage() {
     const register = async () => {
       const res = await fetch(`/api/games/${gameId}`)
       const data = await res.json()
-
-      if (!data.joinedRoles.includes(role)) {
-        if (data.joinedRoles.includes(role)) {
-          alert(`Role ${role} is already taken. Please return to lobby and select the other.`)
-          return
-        }
-      
-        const updated = {
-          ...data,
-          joinedRoles: [...data.joinedRoles, role],
-        }
-      
-        await fetch(`/api/games/${gameId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updated),
-        })
+    
+      // If role is already taken, don't register
+      if (data.joinedRoles.includes(role)) {
+        console.log(`[register] Role ${role} already in use`)
+        return
       }
+    
+      const updated = {
+        ...data,
+        joinedRoles: [...new Set([...data.joinedRoles, role])],
+      }
+    
+      const updateRes = await fetch(`/api/games/${gameId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      })
+    
+      if (!updateRes.ok) {
+        console.error("Failed to register player role")
+        return
+      }
+    
+      // Fetch the latest state after updating
+      const refreshed = await fetch(`/api/games/${gameId}`)
+      const refreshedData = await refreshed.json()
+      setGame(refreshedData)
     }
+    
 
     register()
   }, [gameId])
