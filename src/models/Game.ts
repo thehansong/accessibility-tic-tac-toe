@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose"
+import { Schema, model, models } from "mongoose"
 
 const moveSchema = new Schema({
   player: { type: String, enum: ["X", "O"], required: true },
