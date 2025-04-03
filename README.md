@@ -2,7 +2,7 @@
 **Email**: [thehansong@gmail.com](mailto:thehansong@gmail.com)  
 **LinkedIn**: [thehansong](https://www.linkedin.com/in/thehansong/)
 
-A screen reader-friendly multiplayer Tic Tac Toe game designed for inclusive gaming.
+A screen reader-friendly multiplayer Tic Tac Toe game designed for D&I gaming.
 
 ---
 
@@ -68,3 +68,9 @@ This application is intended to be run **locally**, as per project scope.
 
 ---
 
+### Assumptions & Architecture Notes
+- I assume players first select a role (**X** or **O**) from the lobby before joining a game session.
+- Game state is persisted in MongoDB Atlas and updated in real time via a 1-second polling interval.
+- Player roles are stored in localStorage to persist their identity across refreshes and reloads.
+- The following accessibility features were implemented:
+  - Semantic HTML and ARIA roles (`grid`, `gridcell`, `aria-live`)
