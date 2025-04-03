@@ -71,7 +71,11 @@ This application is intended to be run **locally**, as per project scope.
 
 ### Assumptions & Architecture Notes
 - I assumed players first select a role (**X** or **O**) from the lobby before joining a game session.
-- Game state is persisted in MongoDB Atlas and updated in real time via a 1-second polling interval.
-- Player roles are stored in localStorage to persist their identity across refreshes and reloads.
+- The game only begins when **two active players** have joined the same lobby (i.e., share the same `GameID`).
+- I assumed that a **time limit per move** would be required, so I implemented a **15-second countdown timer**.
+- I assumed a **restart feature** would be helpful for testing or replaying, so I added a **"Restart Game"** button after each match.
+- I assumed users would want to return easily, so I included a **"Back to Main Menu"** button.
+- Game state is persisted using **MongoDB Atlas** and updated in real time via a **1-second polling interval**.
+- Player roles are stored using **`localStorage`** to persist identity across refreshes and reloads.
 - The following accessibility features were implemented:
   - Semantic HTML and ARIA roles (`grid`, `gridcell`, `aria-live`)
