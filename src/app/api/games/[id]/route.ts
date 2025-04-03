@@ -10,10 +10,9 @@ export async function GET(
   try {
     await connectToDatabase()
     
-    // Access id as a property of an awaited Promise to satisfy Next.js
     const { id } = await Promise.resolve(params)
     
-    let game = await Game.findOne({ gameId: id })
+    const game = await Game.findOne({ gameId: id })
 
     if (!game) {
       const newGame = await Game.create({
