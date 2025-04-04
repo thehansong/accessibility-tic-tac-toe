@@ -148,3 +148,17 @@ Once both players have joined with valid, distinct roles, the tic tac toe game w
 - Player roles are stored using **`localStorage`** to persist identity across refreshes and reloads.
 - The following accessibility features were implemented:
   - Semantic HTML and ARIA roles (`grid`, `gridcell`, `aria-live`)
+ 
+---
+
+### 🐞 Known Bugs & Limitations
+
+- **Game ID Reusability Issue**  
+  Once a game session is created, its Game ID is permanently stored in the database. Currently, there's no logic to check whether the game has already ended.  
+  > ⛔ **This means you cannot reuse a Game ID** unless I manually delete it from the database.
+
+- **Shared Browser Identity Bug**  
+  If both Player 1 (**X**) and Player 2 (**O**) are using the **same browser instance** (e.g., two tabs in the same Chrome window rather than Chrome + Incognito), the `localStorage` used for tracking roles may clash.  
+  > 🔄 **This causes a bug where refreshing Player 1’s tab can unexpectedly switch their identity to Player 2.**
+  > 💡 **Workaround:** Use **two separate browser contexts** (e.g., Chrome + Incognito, or different browsers like Chrome and Firefox) to avoid this issue during testing.
+
