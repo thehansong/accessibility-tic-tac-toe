@@ -1,16 +1,17 @@
 # Accessibility Tic Tac Toe – AET-swe_OngYouYang
 A screen reader-friendly multiplayer Tic Tac Toe game designed for D&I gaming.
 
-This README is best viewed directly on [GitHub](https://github.com/thehansong/accessibility-tic-tac-toe) for proper formatting and image rendering guide.
+⭐⭐ This README is best viewed directly on [GitHub](https://github.com/thehansong/accessibility-tic-tac-toe) for proper formatting and image rendering guide. ⭐⭐
 
-Contact:
+**Contact Information**:   
 **Name**: Ong You Yang (Hans)  
 **Email**: [thehansong@gmail.com](mailto:thehansong@gmail.com)  
 **LinkedIn**: [thehansong](https://www.linkedin.com/in/thehansong/)
 
 ### ⚠️ Disclaimers
-- This project is designed and tested with the **Firefox** browser, as it provides the best compatibility with NVDA screen reader.
-- Due to the tight deadline and ongoing examinations, this implementation is a functional prototype focused on core features and key accessibility elements.
+> **Note:** This project is designed and tested with [Firefox](https://www.mozilla.org/en-US/firefox/) as it provides the best compatibility with the **NVDA screen reader**.
+
+> Due to the tight deadline and ongoing examinations, this implementation is a quick functional prototype focused on core features and key accessibility elements.
   
 ---
 
