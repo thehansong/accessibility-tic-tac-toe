@@ -72,6 +72,36 @@ This application is intended to be run **locally**, as per project scope.
 
 ---
 
+### How to Play / Test the Prototype
+
+6. **Open two separate web browser windows instance**  
+     Once you've finished the setup steps above, open the game in **two different browsers** (e.g., Chrome and Incognito mode) or in two tabs on the **SAME device**.
+    ```
+    http://localhost:3000
+    ```
+
+7. **Join the same Game Session**  
+> ⚠️ **To Note:** From the main menu, both players must **select a role** (**X** or **O**) before proceeding.  
+> The game will only begin when **both players have joined the same session** with different roles selected.
+
+- **Player 1 Flow:**
+  - Select a role (**X** or **O**) from the dropdown.
+  - Choose one of the following:
+    - Enter a **custom Game ID** (e.g., `game123`) and click **"Create Game"**, or
+    - Click **"Create Game"** without entering anything to auto-generate a random 6-character Game ID (e.g., `A1B2C3`).
+  - The game instance starts in a **paused state**, waiting for Player 2.
+  - Share the **Game ID** with Player 2.
+
+- **Player 2 Flow:**
+  - Paste the shared **Game ID** into the input field on the main menu.
+  - Select the **available role** (X or O). The system will automatically disable the role already taken by Player 1.
+  - Click **"Join Game"**.
+
+Once both players have joined with valid, distinct roles, the tic tac toe game will begin.
+
+
+---
+
 ### Assumptions & Architecture Notes
 - I assumed players first select a role (**X** or **O**) from the lobby before joining a game session.
 - The game only begins when **two active players** have joined the same lobby (i.e., share the same `GameID`).
