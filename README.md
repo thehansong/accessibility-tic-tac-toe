@@ -8,9 +8,10 @@ Contact:
 **Email**: [thehansong@gmail.com](mailto:thehansong@gmail.com)  
 **LinkedIn**: [thehansong](https://www.linkedin.com/in/thehansong/)
 
-### ⚠️ Disclaimer
-Due to the tight deadline and ongoing examinations, this implementation is a functional prototype focused on core features and key accessibility elements.
-
+### ⚠️ Disclaimers
+- This project is designed and tested with the **Firefox** browser, as it provides the best compatibility with NVDA screen reader.
+- Due to the tight deadline and ongoing examinations, this implementation is a functional prototype focused on core features and key accessibility elements.
+  
 ---
 
 ### Hosting / Deployment Notes
@@ -67,7 +68,7 @@ This application is intended to be run **locally**, as per project scope.
     npm run dev
     ```
 
-5. **Open your web browser _(Google Chrome)_** and navigate to:
+5. **Open your web browser _(Google Firefox)_** and navigate to:
 
     ```
     http://localhost:3000
@@ -83,7 +84,7 @@ This application is intended to be run **locally**, as per project scope.
 ### How to Play / Test the Prototype
 
 6. **Open two separate web browser windows instance**  
-     Once you've finished the setup steps above, open the game in **two different browsers** (e.g., Chrome and Incognito mode) or in two tabs on the **SAME device**.
+     Once you've finished the setup steps above, open the game in **two different browsers** (e.g., Firefox and Private mode) or in two tabs on the **SAME device**.
     ```
     http://localhost:3000
     ```
@@ -158,7 +159,7 @@ Once both players have joined with valid, distinct roles, the tic tac toe game w
   > ⛔ **This means you cannot reuse a Game ID** unless I manually delete it from the database.
 
 - **Shared Browser Identity Bug**  
-  If both Player 1 (**X**) and Player 2 (**O**) are using the **same browser instance** (e.g., two tabs in the same Chrome window rather than Chrome + Incognito), the `localStorage` used for tracking roles may clash.  
+  If both Player 1 (**X**) and Player 2 (**O**) are using the **same browser instance** (e.g., two tabs in the same Firefox window rather than Firefox + Private), the `localStorage` used for tracking roles may clash.  
   > 🔄 **This causes a bug where refreshing Player 1’s tab can unexpectedly switch their identity to Player 2.**
-  > 💡 **Workaround:** Use **two separate browser contexts** (e.g., Chrome + Incognito, or different browsers like Chrome and Firefox) to avoid this issue during testing.
+  > 💡 **Workaround:** Use **two separate browser contexts** (e.g., Firefox + Private, or different Firefox instance on the same PC) to avoid this issue during testing.
 
