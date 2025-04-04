@@ -80,6 +80,8 @@ This application is intended to be run **locally**, as per project scope.
     http://localhost:3000
     ```
 
+&nbsp;
+
 7. **Join the same Game Session**  
 > ⚠️ **To Note:** From the main menu, both players must **select a role** (**X** or **O**) before proceeding.  
 > The game will only begin when **both players have joined the same session** with different roles selected.
@@ -99,6 +101,24 @@ This application is intended to be run **locally**, as per project scope.
 
 Once both players have joined with valid, distinct roles, the tic tac toe game will begin.
 
+&nbsp;
+
+8. **Play the Game**
+- Players take turns marking empty cells on the 3x3 grid.
+- A **15-second countdown timer** is displayed during each player's turn.
+- The current turn and game state are synced between both players in real-time using a 1-second polling interval.
+
+&nbsp;
+
+9. **After the Game Ends**
+- When a player wins or the game ends in a draw:
+  - A result announcement will appear showing who won or if it was a draw.
+  - Players can click **"Restart Game"** button to play again using the same session GameID.
+  - Or, click **"Back to Main Menu"** button to return to the Main Menu lobby and start/join another session.
+  - You can also click **"Game History"** button from either the Main Menu or while in game to view a list of past games, including:
+    - Player roles (X / O)
+    - Move sequences
+    - Final game result
 
 ---
 
