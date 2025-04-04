@@ -73,6 +73,11 @@ This application is intended to be run **locally**, as per project scope.
     http://localhost:3000
     ```
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7d1a0196-422a-4093-b94b-6d0a5f8a2240" alt="Figure 2: Main Menu Lobby screen" width="500"/>
+</p>
+<p align="center"><strong>Figure 2:</strong> The <strong>Main Menu Lobby</strong> screen displayed at <code>http://localhost:3000</code></p>
+
 ---
 
 ### How to Play / Test the Prototype
@@ -89,7 +94,9 @@ This application is intended to be run **locally**, as per project scope.
 > ⚠️ **To Note:** From the main menu, both players must **select a role** (**X** or **O**) before proceeding.  
 > The game will only begin when **both players have joined the same session** with different roles selected.
 
-- **Player 1 Flow:**
+<p align="center"> <img src="https://github.com/user-attachments/assets/86cebe87-5b5b-4780-961e-0b0bf499e929" alt="Figure 3: Player 1 flow – creating a game" width="500"/> </p> <p align="center"><strong>Figure 3:</strong> Player 1 selects a role and creates a game session using a custom or auto-generated Game ID</p>
+
+- **Player 1 Flow (as seen in Figure 3):**
   - Select a role (**X** or **O**) from the dropdown.
   - Choose one of the following:
     - Enter a **custom Game ID** (e.g., `game123`) and click **"Create Game"**, or
@@ -97,7 +104,9 @@ This application is intended to be run **locally**, as per project scope.
   - The game instance starts in a **paused state**, waiting for Player 2.
   - Share the **Game ID** with Player 2.
 
-- **Player 2 Flow:**
+<p align="center"> <img src="https://github.com/user-attachments/assets/d124d458-ff0f-4d4f-b686-d7fa0be64354" alt="Figure 4: Player 2 joining the game session" width="500"/> </p> <p align="center"><strong>Figure 4:</strong> Player 2 enters the shared Game ID, selects the available role, and joins the game session</p>
+
+- **Player 2 Flow (as seen in Figure 4):**
   - Paste the shared **Game ID** into the input field on the main menu.
   - Select the **available role** (X or O). The system will automatically disable the role already taken by Player 1.
   - Click **"Join Game"**.
@@ -106,14 +115,18 @@ Once both players have joined with valid, distinct roles, the tic tac toe game w
 
 &nbsp;
 
-8. **Play the Game**
+<p align="center"> <img src="https://github.com/user-attachments/assets/0f878f63-7a91-4dbd-a56f-213013941db3" alt="Figure 5: In-game screen with countdown timer and current turn" width="500"/> </p> <p align="center"><strong>Figure 5:</strong> In-game screen showing the 3x3 grid, current player's turn, and countdown timer</p>
+
+8. **Play the Game (as seen in Figure 5)**
 - Players take turns marking empty cells on the 3x3 grid.
 - A **15-second countdown timer** is displayed during each player's turn.
 - The current turn and game state are synced between both players in real-time using a 1-second polling interval.
 
 &nbsp;
 
-9. **After the Game Ends**
+<p align="center"> <img src="https://github.com/user-attachments/assets/ac30a5a5-eb1a-44f2-af22-700547c9da61" alt="Figure 6: End game screen with result and options" width="1000"/> </p> <p align="center"><strong>Figure 6:</strong> Game result screen showing the outcome and options to restart, return to main menu, or view game history</p>
+
+9. **After the Game Ends (as seen in Figure 6)**
 - When a player wins or the game ends in a draw:
   - A result announcement will appear showing who won or if it was a draw.
   - Players can click **"Restart Game"** button to play again using the same session GameID.
