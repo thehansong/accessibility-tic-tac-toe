@@ -5,6 +5,9 @@
 
 A screen reader-friendly multiplayer Tic Tac Toe game designed for D&I gaming.
 
+### ⚠️ Disclaimer
+Due to the tight deadline and ongoing examinations, this implementation is a functional prototype focused on core features and key accessibility elements.
+
 ---
 
 ### Hosting / Deployment Notes
