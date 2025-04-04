@@ -22,7 +22,7 @@ This application is intended to be run **locally**, as per project scope.
 ---
 
 ### Setup & Prerequisite
-- **[Node.js v18 or above](https://nodejs.org/en/download/)** – Required to run the project locally
+- **[Node.js v18 or above](https://nodejs.org/en/download/)** – Required to run the project locally.
 
   You can check your version of Node.js with:
     ```
@@ -30,6 +30,10 @@ This application is intended to be run **locally**, as per project scope.
     ```
 - **MongoDB URI** – _No local installation needed_  
   A shared MongoDB Atlas URI is provided in the `.env.local` setup step 3 below.
+
+- **[NVDA Screen Reader (Windows only)](https://www.nvaccess.org/download/)** – Required to test accessibility features. Please download and install NVDA **before running the Tic Tac Toe web application**. This project is specifically designed to support **screen reader users**, and NVDA is **required** to experience the intended accessibility behavior.
+
+-  **[Firefox](https://www.mozilla.org/en-US/firefox/)** – Recommended browser for screen reader testing as NVDA works best with Firefox. Google Chrome support is limited and may not reflect full accessibility behavior.
 
 ---
 
